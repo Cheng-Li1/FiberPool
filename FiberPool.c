@@ -3,12 +3,12 @@
 
 #define INVALID_COHANDLE -1
 
-uint32_t SelectNextCoroutine(int32_t index);
+co_handle SelectNextCoroutine(int32_t index);
 int32_t FindFromPool(Fiber_t Handle);
 
 // This store the register part for the thread that init the coroutine pool
 static uint8_t Registerpart[AArch64_RegsterPart];
-static uint32_t active_co = 0;
+static co_handle active_co = 0;
 
 /* State code for Coroutines */
 typedef enum state_code {
@@ -58,8 +58,9 @@ int32_t FindFromPool(Fiber_t Handle) {
     return -1;
 }
 
-uint32_t SelectNextCoroutine(int32_t index) {
-    uint32_t i = 1, ret = 0;
+co_handle SelectNextCoroutine(int32_t index) {
+    uint32_t i = 1;
+    co_handle ret = 0;
     Coroutine_t next;
     next.priority = 0;
     while (i < MAX_COROUTINE_NUM) {
@@ -75,7 +76,7 @@ uint32_t SelectNextCoroutine(int32_t index) {
 
 void yield() {
     pool[active_co].state = READY;
-    uint32_t ret = SelectNextCoroutine(active_co);
+    co_handle ret = SelectNextCoroutine(active_co);
     pool[ret].state = ACTIVE;
     active_co = ret;
     Fiber_switch(pool[ret].handle);
@@ -83,7 +84,7 @@ void yield() {
 
 void block() {
     pool[active_co].state = BlOCKED;
-    uint32_t ret = SelectNextCoroutine(active_co);
+    co_handle ret = SelectNextCoroutine(active_co);
     pool[ret].state = ACTIVE;
     active_co = ret;
     Fiber_switch(pool[ret].handle);
@@ -91,7 +92,7 @@ void block() {
 
 void kill() {
     pool[active_co].state = FREE;
-    uint32_t ret = SelectNextCoroutine(active_co);
+    co_handle ret = SelectNextCoroutine(active_co);
     pool[ret].state = ACTIVE;
     active_co = ret;
     // Invalidate the co handle
@@ -108,13 +109,13 @@ int32_t wake(co_handle handle) {
 }
 
 int32_t init(struct stack_mem* stack, uint32_t num, uint16_t priority) {
-    if (num > MAX_COROUTINE_NUM) {
+    if (num > MAX_COROUTINE_NUM - 1) {
         return -1;
     }
     Fiber_init((Fiber_t)Registerpart);
     pool[0].handle = (Fiber_t)Registerpart;
     pool[0].priority = priority;
-    pool[0].state = READY;
+    pool[0].state = ACTIVE;
     for (int i = 1; i < num + 1; i++) {
         pool[i].stack = stack[i - 1];
         pool[i].state = FREE;
