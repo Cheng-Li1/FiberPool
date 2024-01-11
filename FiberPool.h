@@ -25,7 +25,8 @@ void block();
 void kill();
 
 // Push a fiber into the coroutine pool
-// Return < 0 if there is no space
+// handle would be able to used to wake the blocked coroutine
+// When a coroutine ends, the handle would be set to a negative value
 void push(void (* func)(void), void* args, uint16_t priority, co_handle* handle);
 
 mutex_t create_mutex();

@@ -1,7 +1,7 @@
 #include "FiberPool.h"
 #include <stdint.h>
 
-#define Invalid_Handle -1
+#define INVALID_COHANDLE -1
 
 uint32_t SelectNextCoroutine(int32_t index);
 int32_t FindFromPool(Fiber_t Handle);
@@ -94,14 +94,14 @@ void kill() {
     uint32_t ret = SelectNextCoroutine(active_co);
     pool[ret].state = ACTIVE;
     active_co = ret;
-    // Invalidate the co handler
-    *(pool[active_co].co_handle) = Invalid_Handle;
+    // Invalidate the co handle
+    *(pool[active_co].co_handle) = INVALID_COHANDLE;
     Fiber_switch(pool[ret].handle);
 }
 
 int32_t wake(co_handle handle) {
-    if (handle == Invalid_Handle) {
-        return Invalid_Handle;
+    if (handle == INVALID_COHANDLE) {
+        return INVALID_COHANDLE;
     }
     pool[handle].state = READY;
     return 0;
@@ -130,7 +130,7 @@ void push(void (* func)(void), void* args, uint16_t priority, co_handle* handle)
         }
     }
     if (i == MAX_COROUTINE_NUM) {
-        *handle = Invalid_Handle;
+        *handle = INVALID_COHANDLE;
         return;
     }
     Fiber_t fiber = Fiber_create(pool[i].stack.memory, pool[i].stack.size, func);
