@@ -1,7 +1,6 @@
 #define MAX_COROUTINE_NUM 5
 #define MAX_LOCK 16
 
-#include "FiberFlow/FiberFlow.h"
 #include <stdint.h>
 
 typedef struct CoroutineLock* mutex_t;
@@ -31,6 +30,7 @@ void* Fiber_GetArgs();
 // When a coroutine ends, the handle would be set to a negative value
 void FiberPool_push(void (* func)(void), void* args, uint16_t priority, co_handle* handle);
 
+// Mutex not implemented yet
 mutex_t create_mutex();
 
 // Does not need a return value

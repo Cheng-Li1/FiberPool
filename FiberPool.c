@@ -1,5 +1,5 @@
 #include "FiberPool.h"
-#include <stdint.h>
+#include "FiberFlow/FiberFlow.h"
 
 #define INVALID_COHANDLE -1
 
@@ -93,10 +93,10 @@ void Fiber_block() {
 void Fiber_kill() {
     pool[active_co].state = FREE;
     co_handle ret = SelectNextCoroutine(active_co);
-    pool[ret].state = ACTIVE;
-    active_co = ret;
     // Invalidate the co handle
     *(pool[active_co].co_handle) = INVALID_COHANDLE;
+    pool[ret].state = ACTIVE;
+    active_co = ret;
     Fiber_switch(pool[ret].handle);
 }
 
