@@ -148,3 +148,7 @@ void* Fiber_GetArgs() {
     Fiber_t temp = Fiber_active();
     return Fiber_getargs(temp);
 }
+
+co_handle Get_Cohandle() {
+    return active_co;
+}

@@ -15,12 +15,15 @@ int32_t FiberPool_init(struct stack_mem* stack, uint32_t num, uint16_t priority)
 
 int32_t Fiber_wake(co_handle handle);
 
+co_handle Get_Cohandle();
+
 // Giving control to other coroutine
 void Fiber_yield();
 
 void Fiber_block();
 
 // Declare this coroutine is finished
+/* Kill the main thread may cause undefined bahavior */
 void Fiber_kill();
 
 void* Fiber_GetArgs();
