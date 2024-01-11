@@ -99,8 +99,12 @@ void kill() {
     Fiber_switch(pool[ret].handle);
 }
 
-void wake(co_handle index) {
-    pool[index].state = READY;
+int32_t wake(co_handle handle) {
+    if (handle == Invalid_Handle) {
+        return Invalid_Handle;
+    }
+    pool[handle].state = READY;
+    return 0;
 }
 
 int32_t init(struct stack_mem* stack, uint32_t num, uint16_t priority) {

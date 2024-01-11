@@ -14,7 +14,7 @@ struct stack_mem {
 
 int32_t init(struct stack_mem* stack, uint32_t num, uint16_t priority);
 
-void wake(co_handle index);
+int32_t wake(co_handle handle);
 
 // Giving control to other coroutine
 void yield();
