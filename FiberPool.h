@@ -26,7 +26,7 @@ void kill();
 
 // Push a fiber into the coroutine pool
 // Return < 0 if there is no space
-co_handle push(void (* func)(void), void* args, uint16_t priority);
+void push(void (* func)(void), void* args, uint16_t priority, co_handle* handle);
 
 mutex_t create_mutex();
 

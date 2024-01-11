@@ -1,6 +1,8 @@
 #include "FiberPool.h"
 #include <stdint.h>
 
+#define Invalid_Handle -1
+
 uint32_t SelectNextCoroutine(int32_t index);
 int32_t FindFromPool(Fiber_t Handle);
 
@@ -28,8 +30,12 @@ typedef struct Coroutine {
     Fiber_t handle;
     uint16_t priority;
     state_t state;
+    // Used to implement lock
     uint32_t index;
+    // Stack management
     struct stack_mem stack;
+    // Handle for state
+    co_handle *co_handle;
 } Coroutine_t;
 
 // The implementation of lock for coroutines does not involves atomics
@@ -88,6 +94,8 @@ void kill() {
     uint32_t ret = SelectNextCoroutine(active_co);
     pool[ret].state = ACTIVE;
     active_co = ret;
+    // Invalidate the co handler
+    *(pool[active_co].co_handle) = Invalid_Handle;
     Fiber_switch(pool[ret].handle);
 }
 
@@ -110,7 +118,7 @@ int32_t init(struct stack_mem* stack, uint32_t num, uint16_t priority) {
     return 0;
 }
 
-int32_t push(void (*func)(void), void* args, uint16_t priority) {
+void push(void (* func)(void), void* args, uint16_t priority, co_handle* handle) {
     int32_t i;
     for (i = 0; i < MAX_COROUTINE_NUM; i++) {
         if (pool[i].state == FREE) {
@@ -118,11 +126,15 @@ int32_t push(void (*func)(void), void* args, uint16_t priority) {
         }
     }
     if (i == MAX_COROUTINE_NUM) {
-        return -1;
+        *handle = Invalid_Handle;
+        return;
     }
-    Fiber_t handle = Fiber_create(pool[i].stack.memory, pool[i].stack.size, func);
-    Fiber_setargs(handle, args);
+    Fiber_t fiber = Fiber_create(pool[i].stack.memory, pool[i].stack.size, func);
+    Fiber_setargs(fiber, args);
+    *handle = i;
+    pool[i].handle = fiber;
     pool[i].priority = priority;
     pool[i].state = READY;
-    return i;
+    pool[i].co_handle = handle;
+    return;
 }
