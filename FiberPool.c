@@ -74,7 +74,7 @@ co_handle SelectNextCoroutine(int32_t index) {
     return ret;
 }
 
-void yield() {
+void Fiber_yield() {
     pool[active_co].state = READY;
     co_handle ret = SelectNextCoroutine(active_co);
     pool[ret].state = ACTIVE;
@@ -82,7 +82,7 @@ void yield() {
     Fiber_switch(pool[ret].handle);
 }
 
-void block() {
+void Fiber_block() {
     pool[active_co].state = BlOCKED;
     co_handle ret = SelectNextCoroutine(active_co);
     pool[ret].state = ACTIVE;
@@ -90,7 +90,7 @@ void block() {
     Fiber_switch(pool[ret].handle);
 }
 
-void kill() {
+void Fiber_kill() {
     pool[active_co].state = FREE;
     co_handle ret = SelectNextCoroutine(active_co);
     pool[ret].state = ACTIVE;
@@ -100,7 +100,7 @@ void kill() {
     Fiber_switch(pool[ret].handle);
 }
 
-int32_t wake(co_handle handle) {
+int32_t Fiber_wake(co_handle handle) {
     if (handle == INVALID_COHANDLE) {
         return INVALID_COHANDLE;
     }
@@ -108,7 +108,7 @@ int32_t wake(co_handle handle) {
     return 0;
 }
 
-int32_t init(struct stack_mem* stack, uint32_t num, uint16_t priority) {
+int32_t FiberPool_init(struct stack_mem* stack, uint32_t num, uint16_t priority) {
     if (num > MAX_COROUTINE_NUM - 1) {
         return -1;
     }
@@ -123,7 +123,7 @@ int32_t init(struct stack_mem* stack, uint32_t num, uint16_t priority) {
     return 0;
 }
 
-void push(void (* func)(void), void* args, uint16_t priority, co_handle* handle) {
+void FiberPool_push(void (* func)(void), void* args, uint16_t priority, co_handle* handle) {
     int32_t i;
     for (i = 0; i < MAX_COROUTINE_NUM; i++) {
         if (pool[i].state == FREE) {
@@ -142,4 +142,9 @@ void push(void (* func)(void), void* args, uint16_t priority, co_handle* handle)
     pool[i].state = READY;
     pool[i].co_handle = handle;
     return;
+}
+
+void* Fiber_GetArgs() {
+    Fiber_t temp = Fiber_active();
+    return Fiber_getargs(temp);
 }
