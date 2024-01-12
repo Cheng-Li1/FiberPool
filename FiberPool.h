@@ -42,3 +42,54 @@ void acquire_mutex(mutex_t);
 void release_mutex(mutex_t);
 
 void destroy_mutex(mutex_t);
+
+/* simple usage example
+#include "FiberPool/FiberPool.h"
+#include <stdlib.h>
+#include <stdio.h>
+
+char* string = "I am a running coroutine!\n";
+
+void print_stuff1() {
+    printf("Now I yield\n");
+    Fiber_yield();
+    printf("Well I am back again, gonna kill myself\n");
+    Fiber_kill();
+}
+
+void print_stuff2() {
+    printf("Get my args first!\n");
+    char* p = Fiber_GetArgs();
+    printf("My args is %s\n", p);
+    printf("Try to block myself\n");
+    Fiber_block();
+    printf("I am waken\n");
+    Fiber_kill();
+}
+
+int main() {
+    void* stack1 = malloc(4096);
+    void* stack2 = malloc(4096);
+    void* stack3 = malloc(4096);
+    void* stack4 = malloc(4096);
+    struct stack_mem stackarray[4];
+    stackarray[0].memory = stack1;
+    stackarray[0].size = 4096;
+    stackarray[1].memory = stack2;
+    stackarray[1].size = 4096;
+    stackarray[2].memory = stack3;
+    stackarray[2].size = 4096;
+    stackarray[3].memory = stack4;
+    stackarray[3].size = 4096;
+    FiberPool_init(stackarray, 4, 1);
+    co_handle f, f2;
+    FiberPool_push(print_stuff1, NULL, 2, &f);
+    FiberPool_push(print_stuff2, string, 2, &f2);
+    Fiber_yield();
+    Fiber_wake(f2);
+    Fiber_yield();
+    printf("Well, get control again!\n");
+    return 0;
+}
+
+*/
