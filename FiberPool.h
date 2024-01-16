@@ -1,5 +1,6 @@
 #define MAX_COROUTINE_NUM 5
 #define MAX_LOCK 16
+#define INVALID_COHANDLE -1
 
 #include <stdint.h>
 
@@ -31,7 +32,13 @@ void* Fiber_GetArgs();
 // Push a fiber into the coroutine pool
 // handle would be able to used to wake the blocked coroutine
 // When a coroutine ends, the handle would be set to a negative value
-void FiberPool_push(void (* func)(void), void* args, uint16_t priority, co_handle* handle);
+int32_t FiberPool_push(void (* func)(void), void* args, uint16_t priority, co_handle* handle);
+
+// Return the index of the next free coroutine in the pool
+int32_t FiberPool_FindFree();
+
+// Function to set args for a coroutine
+void FiberPool_SetArgs(co_handle handle, void* data);
 
 // Mutex not implemented yet
 mutex_t create_mutex();
