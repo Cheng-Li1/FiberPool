@@ -27,6 +27,8 @@ void Fiber_block();
 /* Kill the main thread may cause undefined bahavior */
 void Fiber_kill();
 
+co_handle Fiber_next();
+
 void* Fiber_GetArgs();
 
 // Push a fiber into the coroutine pool

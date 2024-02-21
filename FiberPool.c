@@ -98,6 +98,10 @@ void Fiber_kill() {
     Fiber_switch(pool[ret].handle);
 }
 
+co_handle Fiber_next() {
+    return SelectNextCoroutine(active_co);
+}
+
 int32_t Fiber_wake(co_handle handle) {
     if (handle == INVALID_COHANDLE) {
         return INVALID_COHANDLE;
