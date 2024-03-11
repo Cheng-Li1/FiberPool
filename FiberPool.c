@@ -4,8 +4,6 @@
 co_handle SelectNextCoroutine(int32_t index);
 int32_t FindFromPool(Fiber_t Handle);
 
-// This store the register part for the thread that init the coroutine pool
-static uint8_t Registerpart[AArch64_RegsterPart];
 static co_handle active_co = 0;
 
 /* State code for Coroutines */
@@ -114,8 +112,7 @@ int32_t FiberPool_init(struct stack_mem* stack, uint32_t num, uint16_t priority)
     if (num > MAX_COROUTINE_NUM - 1) {
         return -1;
     }
-    Fiber_init((Fiber_t)Registerpart);
-    pool[0].handle = (Fiber_t)Registerpart;
+    pool[0].handle = Fiber_init();
     pool[0].priority = priority;
     pool[0].state = ACTIVE;
     for (int i = 1; i < num + 1; i++) {
