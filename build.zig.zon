@@ -1,0 +1,6 @@
+.{ .name = "FiberPool", .version = "0.1.0", .dependencies = .{ .FiberFlow = .{ .path = "FiberFlow" } }, .paths = .{
+    "FiberPool.h",
+    "FiberPool.c",
+    "build.zig",
+    "build.zig.zon",
+} }
