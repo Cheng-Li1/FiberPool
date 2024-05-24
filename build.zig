@@ -32,7 +32,7 @@ pub fn build(b: *std.Build) void {
 
     lib.addIncludePath(.{ .path = "." });
 
-    lib.addCSourceFile(.{ .file = b.path("FiberPool.c") });
+    lib.addCSourceFile(.{ .file = b.path("FiberPool.c"), .flags = &.{"-mstrict-align"} });
 
     b.installArtifact(lib);
 }
