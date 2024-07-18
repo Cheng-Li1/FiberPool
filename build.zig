@@ -30,7 +30,7 @@ pub fn build(b: *std.Build) void {
 
     lib.linkLibrary(FiberFlow);
 
-    lib.addIncludePath(.{ .path = "." });
+    lib.addIncludePath(.{ .cwd_relative = "." });
 
     lib.addCSourceFile(.{ .file = b.path("FiberPool.c"), .flags = &.{"-mstrict-align"} });
 
