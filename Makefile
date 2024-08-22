@@ -1,13 +1,13 @@
 # Makefile for fiberpool
 
-FF_DIR = ./FiberFlow
+FIBERPOOL_PATH ?= ./
 
 # Compiler
 CC := clang
 
 TARGET := aarch64-none-elf
 
-BUILD_DIR := build
+BUILD_DIR ?= build
 
 # Compiler flags
 CFLAGS = \
@@ -18,32 +18,25 @@ CFLAGS = \
 		-g \
 		-O0 \
 		-mstrict-align \
-		-I$(FF_DIR) \
-
-# Source files
-SRCS := FiberPool.c
+		-I$(FIBERPOOL_PATH) \
 
 STATIC_LIB := libfiberpool.a
 
 # Default rule
-all: $(STATIC_LIB)
+all: $(BUILD_DIR)/$(STATIC_LIB)
 
 # Object files (generated from source files)
-OBJS := build/fiberpool.o \
-        build/fiberflow.o \
+OBJS := $(BUILD_DIR)/fiberpool.o \
+		$(BUILD_DIR)/fiberflow.o \
 
-# Rule to compile source files into object files
-%.o: %.c
-	$(CC) $(CFLAGS) -c $< -o $@
-
-$(BUILD_DIR)/fiberpool.o: ./FiberPool.c Makefile
+$(BUILD_DIR)/fiberpool.o: $(FIBERPOOL_PATH)/FiberPool.c $(FIBERPOOL_PATH)/Makefile
 	$(CC) -c $(CFLAGS) $< -o $@
 
-$(BUILD_DIR)/fiberflow.o: ./FiberFlow/FiberFlow.c Makefile
+$(BUILD_DIR)/fiberflow.o: $(FIBERPOOL_PATH)/FiberFlow/FiberFlow.c $(FIBERPOOL_PATH)/Makefile
 	$(CC) -c $(CFLAGS) $< -o $@
 
 # Rule to link the target executable
-$(STATIC_LIB): $(OBJS)
+$(BUILD_DIR)/$(STATIC_LIB): $(OBJS)
 	ar rcs $@ $(OBJS)
 
 # Phony targets (not files)
